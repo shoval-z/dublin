@@ -186,12 +186,12 @@ class MyFrame(wx.Frame):
             self.station_to_attraction['station'].isin(self.second_s))]['lines'].values[0]
         second_lines = second_lines.strip('[').strip(']').strip("'").strip('"').strip('`').replace("'", "").split(', ')
         lines = ''
-        for idx, item in enumerate(first_lines):
+        for idx, item in enumerate(second_lines):
             for idx2, item2 in enumerate(item):
                 if (idx2 < 2 and item2 == '0') or idx2 == 4:
                     continue
                 lines += item2
-            if idx != len(first_lines) - 1:
+            if idx != len(second_lines) - 1:
                 lines += ', '
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         phone = att[att['Name'] == self.second_a]['Telephone'].values[0]
@@ -214,12 +214,12 @@ class MyFrame(wx.Frame):
             self.station_to_attraction['station'].isin(self.third_s))]['lines'].values[0]
         third_lines = third_lines.strip('[').strip(']').strip("'").strip('"').strip('`').replace("'", "").split(', ')
         lines = ''
-        for idx, item in enumerate(first_lines):
+        for idx, item in enumerate(third_lines):
             for idx2, item2 in enumerate(item):
                 if (idx2 < 2 and item2 == '0') or idx2 == 4:
                     continue
                 lines += item2
-            if idx != len(first_lines) - 1:
+            if idx != len(third_lines) - 1:
                 lines += ', '
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         phone = att[att['Name'] == self.third_a]['Telephone'].values[0]
