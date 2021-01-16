@@ -21,11 +21,11 @@ class MyFrame(wx.Frame):
         staticText1 = wx.StaticText(panel, -1, " Choose your current bus station:")
         sizer.Add(staticText1, 0, wx.ALL)
 
-        stations = pd.read_csv('bus_stop.csv')
+        stations = pd.read_csv('data/bus_stop.csv')
         stations = stations['stop_code'].unique()
         stations = [str(s) for s in stations]
-        self.station_to_attraction = pd.read_csv('station_to_atraction.csv')
-        self.attraction_station = pd.read_csv('attraction&station.csv')
+        self.station_to_attraction = pd.read_csv('data/station_to_atraction.csv')
+        self.attraction_station = pd.read_csv('data/attraction&station.csv')
         self.first_s, self.first_a, self.second_a, self.third_a = None, None, None, None
 
         self.combo_box_product = wx.ComboBox(panel, wx.ID_ANY, choices=stations,
@@ -41,7 +41,7 @@ class MyFrame(wx.Frame):
         # set image
         panel = wx.Panel(self, size=(550, 220), pos=(550, 10))
         sizer1 = wx.GridBagSizer(5, 5)
-        icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('welcome_dublin.png'))
+        icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('data/welcome_dublin.png'))
         sizer1.Add(icon, pos=(0, 4), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,
                    border=5)
 
@@ -165,7 +165,7 @@ class MyFrame(wx.Frame):
                 lines += ', '
         print(first_lines,lines)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        att = pd.read_csv('attraction.csv')
+        att = pd.read_csv('data/attraction.csv')
         phone = att[att['Name'] == self.first_a]['Telephone'].values[0]
         url = att[att['Name'] == self.first_a]['Url'].values[0]
         if phone and url:
@@ -241,7 +241,7 @@ class MyFrame(wx.Frame):
         # set image
         panel = wx.Panel(self, size=(500, 300), pos=(600, 250))
         sizer1 = wx.GridBagSizer(5, 5)
-        icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('dublin_safe.png'))
+        icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('data/dublin_safe.png'))
         sizer1.Add(icon, pos=(0, 4), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,
                    border=5)
 
@@ -250,8 +250,8 @@ class MyFrame(wx.Frame):
                          pos=(20, 400), size=(140, 20))
 
     def create_map(self):
-        att = pd.read_csv('attraction.csv')
-        stops = pd.read_csv('bus_stop.csv')
+        att = pd.read_csv('data/attraction.csv')
+        stops = pd.read_csv('data/bus_stop.csv')
 
         s_lat = stops[stops['stop_code'] == self.first_s]['Y'].values[0]
         s_long = stops[stops['stop_code'] == self.first_s]['X'].values[0]
