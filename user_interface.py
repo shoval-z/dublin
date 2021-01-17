@@ -6,6 +6,10 @@ import wx.lib.agw.hyperlink as hl
 import folium
 from folium.features import DivIcon
 import os
+from geopy import distance
+import shapefile
+import math
+
 
 
 class MyFrame(wx.Frame):
@@ -89,13 +93,11 @@ class MyFrame(wx.Frame):
         print(x)
         self.first_a = x
         stations = self.attraction_station[self.attraction_station['attraction'] == x]['bus_stations'].values[0].strip(
-            '[').strip(']').split(',')
+            '[').strip(']').split(', ')
         int_stations = list()
         for idx, s in enumerate(stations):
-            if idx == 0:
-                int_stations.append(int(s))
-            else:
-                int_stations.append(int(s[1:]))
+            int_stations.append(int(s))
+        print(int_stations)
         self.second_s = int_stations
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         staticText1 = wx.StaticText(self, -1, " Choose your second attraction:", pos=(20, 110))
@@ -118,15 +120,12 @@ class MyFrame(wx.Frame):
         print(x)
         self.second_a = x
         stations = self.attraction_station[self.attraction_station['attraction'] == x]['bus_stations'].values[0].strip(
-            '[').strip(']').split(',')
+            '[').strip(']').split(', ')
         int_stations = list()
         for idx, s in enumerate(stations):
-            if idx == 0:
-                int_stations.append(int(s))
-            else:
-                int_stations.append(int(s[1:]))
+            int_stations.append(int(s))
 
-        print(stations)
+        print(int_stations)
         self.third_s = int_stations
         att = self.station_to_attraction[self.station_to_attraction['station'].isin(int_stations)]['attraction'].values
 
@@ -163,16 +162,15 @@ class MyFrame(wx.Frame):
                 lines += item2
             if idx != len(first_lines) - 1:
                 lines += ', '
-        print(first_lines,lines)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         att = pd.read_csv('data/attraction.csv')
-        phone = att[att['Name'] == self.first_a]['Telephone'].values[0]
-        url = att[att['Name'] == self.first_a]['Url'].values[0]
-        if phone and url:
+        phone = str(att[att['Name'] == self.first_a]['Telephone'].values[0])
+        url = str(att[att['Name'] == self.first_a]['Url'].values[0])
+        if phone != 'nan' and url != 'nan':
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the first attraction are: {lines}\n for more inforamtion you can contect {phone}\n and visit {url}",
                                         pos=(20, 220))
-        elif phone and not url:
+        elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the first attraction are: {first_lines}\n for more inforamtion you can contect {phone}",
                                         pos=(20, 220))
@@ -194,13 +192,13 @@ class MyFrame(wx.Frame):
             if idx != len(second_lines) - 1:
                 lines += ', '
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        phone = att[att['Name'] == self.second_a]['Telephone'].values[0]
-        url = att[att['Name'] == self.second_a]['Url'].values[0]
-        if phone and url:
+        phone = str(att[att['Name'] == self.second_a]['Telephone'].values[0])
+        url = str(att[att['Name'] == self.second_a]['Url'].values[0])
+        if phone != 'nan' and url != 'nan':
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the second attraction are: {lines}\n for more inforamtion you can contect {phone}\n and visit {url}",
                                         pos=(20, 280))
-        elif phone and not url:
+        elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the second attraction are: {second_lines}\n for more inforamtion you can contect {phone}",
                                         pos=(20, 280))
@@ -210,7 +208,7 @@ class MyFrame(wx.Frame):
                                         pos=(20, 280))
         sizer.Add(staticText1, 0, wx.ALL)
 
-        third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.second_a) & (
+        third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.third_a) & (
             self.station_to_attraction['station'].isin(self.third_s))]['lines'].values[0]
         third_lines = third_lines.strip('[').strip(']').strip("'").strip('"').strip('`').replace("'", "").split(', ')
         lines = ''
@@ -222,13 +220,13 @@ class MyFrame(wx.Frame):
             if idx != len(third_lines) - 1:
                 lines += ', '
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        phone = att[att['Name'] == self.third_a]['Telephone'].values[0]
-        url = att[att['Name'] == self.third_a]['Url'].values[0]
-        if phone and url:
+        phone = str(att[att['Name'] == self.third_a]['Telephone'].values[0])
+        url = str(att[att['Name'] == self.third_a]['Url'].values[0])
+        if phone != 'nan' and url != 'nan':
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the third attraction are: {lines}\n for more inforamtion you can contect {phone}\n and visit {url}",
                                         pos=(20, 340))
-        elif phone and not url:
+        elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the third attraction are: {third_lines}\n for more inforamtion you can contect {phone}",
                                         pos=(20, 340))
@@ -253,8 +251,12 @@ class MyFrame(wx.Frame):
         att = pd.read_csv('data/attraction.csv')
         stops = pd.read_csv('data/bus_stop.csv')
 
-        s_lat = stops[stops['stop_code'] == self.first_s]['Y'].values[0]
-        s_long = stops[stops['stop_code'] == self.first_s]['X'].values[0]
+        s1_lat = stops[stops['stop_code'] == self.first_s]['Y'].values[0]
+        s1_long = stops[stops['stop_code'] == self.first_s]['X'].values[0]
+        s2_lat = stops[stops['stop_code'] == self.second_s[0]]['Y'].values[0]
+        s2_long = stops[stops['stop_code'] == self.second_s[0]]['X'].values[0]
+        s3_lat = stops[stops['stop_code'] == self.third_s[0]]['Y'].values[0]
+        s3_long = stops[stops['stop_code'] == self.third_s[0]]['X'].values[0]
 
         at1_lat = att[att['Name'] == self.first_a]['Latitude'].values[0]
         at1_long = att[att['Name'] == self.first_a]['Longitude'].values[0]
@@ -270,7 +272,7 @@ class MyFrame(wx.Frame):
 
         map_osm = folium.Map(location=[df_loc.iloc[0]["lat"], df_loc.iloc[0]["long"]], zoom_start=12)
 
-        folium.Marker(location=[s_lat, s_long],
+        folium.Marker(location=[s1_lat, s1_long],
                       icon=folium.Icon(color='red', icon='info-sign')).add_to(
             map_osm)
 
@@ -279,7 +281,77 @@ class MyFrame(wx.Frame):
                                       icon=folium.Icon(color='blue', icon='info-sign')).add_to(
                 map_osm),
             axis=1)
-        folium.Marker((s_lat, s_long + 0.001), icon=DivIcon(
+
+
+        ## add bus line
+        possible_colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880',
+                           '#FF97FF', '#FECB52']
+        first_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.first_a) & (
+                self.station_to_attraction['station'] == self.first_s)]['lines'].values[0]
+        first_lines = first_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        # lines = ''
+        for idx, item in enumerate(first_lines):
+            line = ''
+            for idx2, item2 in enumerate(item):
+                if (idx2 < 2 and item2 == '0') or idx2 == 4:
+                    continue
+                if idx2 ==2 and item2 == '0' and item[idx2-1] == '0':
+                    continue
+                line += item2
+            # if idx != len(first_lines) - 1:
+            points = find_bus_route(line,(s1_lat,s1_long),(at1_lat,at1_long))
+            if points:
+                color = possible_colors[0]
+                del possible_colors[0]
+                folium.PolyLine(points, color=color).add_to(map_osm)
+
+        second_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.second_a) & (
+            self.station_to_attraction['station'] == self.second_s[0])]['lines'].values[0]
+        second_lines = second_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        for idx, item in enumerate(second_lines):
+            line = ''
+            for idx2, item2 in enumerate(item):
+                if (idx2 < 2 and item2 == '0') or idx2 == 4:
+                    continue
+                if idx2 == 2 and item2 == '0' and item[idx2 - 1] == '0':
+                    continue
+                line += item2
+            points = find_bus_route(line, (s2_lat, s2_long), (at2_lat, at2_long))
+            if points:
+                color = possible_colors[0]
+                del possible_colors[0]
+                folium.PolyLine(points, color=color).add_to(map_osm)
+
+        third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.third_a) & (
+                self.station_to_attraction['station'] == self.third_s[0])]['lines'].values[0]
+        third_lines = third_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        for idx, item in enumerate(third_lines):
+            line = ''
+            for idx2, item2 in enumerate(item):
+                if (idx2 < 2 and item2 == '0') or idx2 == 4:
+                    continue
+                if idx2 == 2 and item2 == '0' and item[idx2 - 1] == '0':
+                    continue
+                line += item2
+            points = find_bus_route(line, (s3_lat, s3_long), (at2_lat, at2_long))
+            if points:
+                color = possible_colors[0]
+                del possible_colors[0]
+                folium.PolyLine(points, color=color).add_to(map_osm)
+
+        # folium.Marker((s2_lat, s2_long + 0.001), icon=DivIcon(
+        #     icon_size=(150, 36),
+        #     icon_anchor=(7, 20),
+        #     html='<div style="font-size: 11pt; color : red; font-weight:bold; background:white; opacity:0.75;border:2px solid black;">station to attraction 2</div>',
+        # )).add_to(map_osm)
+        #
+        # folium.Marker((s3_lat, s3_long + 0.001), icon=DivIcon(
+        #     icon_size=(150, 36),
+        #     icon_anchor=(7, 20),
+        #     html='<div style="font-size: 11pt; color : red; font-weight:bold; background:white; opacity:0.75;border:2px solid black;">station to attraction 3</div>',
+        # )).add_to(map_osm)
+
+        folium.Marker((s1_lat, s1_long + 0.001), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
             html='<div style="font-size: 11pt; color : red; font-weight:bold; background:white; opacity:0.75;border:2px solid black;">you are here</div>',
@@ -287,23 +359,73 @@ class MyFrame(wx.Frame):
         folium.Marker((at1_lat, at1_long + 0.001), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
-            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">{self.first_a}</div>',
+            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">1 {self.first_a}</div>',
         )).add_to(map_osm)
         folium.Marker((at2_lat, at2_long + 0.001), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
-            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">{self.second_a}</div>',
+            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">2 {self.second_a}</div>',
         )).add_to(map_osm)
         folium.Marker((at3_lat, at3_long + 0.001), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
-            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">{self.third_a}</div>',
+            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">3 {self.third_a}</div>',
         )).add_to(map_osm)
+
+
 
         map_osm.save("index.html")
         os.system('git add index.html')
         os.system('git commit -m "update"')
         os.system('git push')
+
+def find_bus_route(bus_line,x_point,y_point):
+    shape = shapefile.Reader("data/NTA_Public_Transport/NTA_Public_Transport.shp")
+    shape_dict = {r.record.route_name: r.shape for r in shape.shapeRecords()}  # {lineid : Shape}
+    if bus_line in shape_dict:
+        parts = shape_dict[bus_line].parts
+        points = shape_dict[bus_line].points
+        geom = []
+        for i in range(len(parts)):
+            xy = []
+            # pt = None
+            if i < len(parts) - 1:
+                pt = points[parts[i]:parts[i + 1]]
+            else:
+                pt = points[parts[i]:]
+            for x, y in pt:
+                xy.append([y, x])
+            geom.append(xy)
+        return update_route(x_point, y_point, geom)
+
+
+def update_route(x,y,points): #x=(lat,long), y=(lat,long), points=[[(lat,long),(lat,long),..][..]]
+    closest_to_x, closest_to_y = None,None
+    min_dist_to_x, min_dist_to_y = None,None
+    for row_idx, row in enumerate(points):
+        for p_idx, p in enumerate(row):
+            dist_x = distance.distance(x, p).m
+            dist_y = distance.distance(y, p).m
+            if not closest_to_x:
+                closest_to_x, closest_to_y = (row_idx, p_idx), (row_idx, p_idx)
+                min_dist_to_x, min_dist_to_y = dist_x, dist_y
+            if min_dist_to_x > dist_x:
+                closest_to_x = (row_idx, p_idx)
+                min_dist_to_x = dist_x
+            if min_dist_to_y > dist_y:
+                closest_to_y = (row_idx, p_idx)
+                min_dist_to_y = dist_y
+    if closest_to_x == closest_to_y:
+        closest_to_y = (closest_to_y[0],closest_to_y[1]+1)
+    if closest_to_x[0] <= closest_to_y[0]:
+        new_route = points[closest_to_x[0]:closest_to_y[0] + 1]
+        new_route[0] = new_route[0][closest_to_x[1] - 1:]
+        new_route[-1] = new_route[-1][:closest_to_y[1] + 1]
+    else:
+        new_route = points[closest_to_y[0]:closest_to_x[0] + 1]
+        new_route[0] = new_route[0][closest_to_y[1] - 1:]
+        new_route[-1] = new_route[-1][:closest_to_x[1] + 1]
+    return new_route
 
 
 if __name__ == "__main__":
