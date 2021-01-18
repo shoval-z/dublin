@@ -8,6 +8,7 @@ from folium.features import DivIcon
 import os
 from geopy import distance
 import shapefile
+import ast
 import math
 
 
@@ -28,7 +29,7 @@ class MyFrame(wx.Frame):
         stations = pd.read_csv('data/bus_stop.csv')
         stations = stations['stop_code'].unique()
         stations = [str(s) for s in stations]
-        self.station_to_attraction = pd.read_csv('data/station_to_atraction.csv')
+        self.station_to_attraction = pd.read_csv('data/station_to_attraction.csv')
         self.attraction_station = pd.read_csv('data/attraction&station.csv')
         self.first_s, self.first_a, self.second_a, self.third_a = None, None, None, None
 
@@ -153,7 +154,8 @@ class MyFrame(wx.Frame):
         self.create_map()
         first_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.first_a) & (
                 self.station_to_attraction['station'] == self.first_s)]['lines'].values[0]
-        first_lines = first_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        first_lines = ast.literal_eval(first_lines)
+        # first_lines = first_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
         lines = ''
         for idx, item in enumerate(first_lines):
             for idx2, item2 in enumerate(item):
@@ -182,7 +184,7 @@ class MyFrame(wx.Frame):
 
         second_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.second_a) & (
             self.station_to_attraction['station'].isin(self.second_s))]['lines'].values[0]
-        second_lines = second_lines.strip('[').strip(']').strip("'").strip('"').strip('`').replace("'", "").split(', ')
+        second_lines = ast.literal_eval(second_lines)
         lines = ''
         for idx, item in enumerate(second_lines):
             for idx2, item2 in enumerate(item):
@@ -210,7 +212,7 @@ class MyFrame(wx.Frame):
 
         third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.third_a) & (
             self.station_to_attraction['station'].isin(self.third_s))]['lines'].values[0]
-        third_lines = third_lines.strip('[').strip(']').strip("'").strip('"').strip('`').replace("'", "").split(', ')
+        third_lines = ast.literal_eval(third_lines)
         lines = ''
         for idx, item in enumerate(third_lines):
             for idx2, item2 in enumerate(item):
@@ -272,8 +274,17 @@ class MyFrame(wx.Frame):
 
         map_osm = folium.Map(location=[df_loc.iloc[0]["lat"], df_loc.iloc[0]["long"]], zoom_start=12)
 
+
         folium.Marker(location=[s1_lat, s1_long],
-                      icon=folium.Icon(color='red', icon='info-sign')).add_to(
+                      icon=folium.Icon(icon='bus', prefix='fa',color='red')).add_to(
+            map_osm)
+
+
+        folium.Marker(location=[s2_lat, s2_long],
+                      icon=folium.Icon(icon='bus', prefix='fa',color='purple'),tooltip=f'station to {self.second_a}').add_to(
+            map_osm)
+        folium.Marker(location=[s3_lat, s3_long],
+                      icon=folium.Icon(icon='bus', prefix='fa',color='purple'),tooltip=f'station to {self.third_a}').add_to(
             map_osm)
 
         df_loc.apply(
@@ -288,7 +299,7 @@ class MyFrame(wx.Frame):
                            '#FF97FF', '#FECB52']
         first_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.first_a) & (
                 self.station_to_attraction['station'] == self.first_s)]['lines'].values[0]
-        first_lines = first_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        first_lines = ast.literal_eval(first_lines)
         # lines = ''
         for idx, item in enumerate(first_lines):
             line = ''
@@ -298,16 +309,15 @@ class MyFrame(wx.Frame):
                 if idx2 ==2 and item2 == '0' and item[idx2-1] == '0':
                     continue
                 line += item2
-            # if idx != len(first_lines) - 1:
             points = find_bus_route(line,(s1_lat,s1_long),(at1_lat,at1_long))
             if points:
                 color = possible_colors[0]
                 del possible_colors[0]
-                folium.PolyLine(points, color=color).add_to(map_osm)
+                folium.vector_layers.PolyLine(points, color=color,tooltip=line).add_to(map_osm)
 
         second_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.second_a) & (
             self.station_to_attraction['station'] == self.second_s[0])]['lines'].values[0]
-        second_lines = second_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        second_lines = ast.literal_eval(second_lines)
         for idx, item in enumerate(second_lines):
             line = ''
             for idx2, item2 in enumerate(item):
@@ -320,11 +330,11 @@ class MyFrame(wx.Frame):
             if points:
                 color = possible_colors[0]
                 del possible_colors[0]
-                folium.PolyLine(points, color=color).add_to(map_osm)
+                folium.vector_layers.PolyLine(points, color=color,tooltip=line).add_to(map_osm)
 
         third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.third_a) & (
                 self.station_to_attraction['station'] == self.third_s[0])]['lines'].values[0]
-        third_lines = third_lines.strip('[').strip(']').strip("'").replace("'", "").split(', ')
+        third_lines = ast.literal_eval(third_lines)
         for idx, item in enumerate(third_lines):
             line = ''
             for idx2, item2 in enumerate(item):
@@ -333,11 +343,11 @@ class MyFrame(wx.Frame):
                 if idx2 == 2 and item2 == '0' and item[idx2 - 1] == '0':
                     continue
                 line += item2
-            points = find_bus_route(line, (s3_lat, s3_long), (at2_lat, at2_long))
+            points = find_bus_route(line, (s3_lat, s3_long), (at3_lat, at3_long))
             if points:
                 color = possible_colors[0]
                 del possible_colors[0]
-                folium.PolyLine(points, color=color).add_to(map_osm)
+                folium.vector_layers.PolyLine(points, color=color,tooltip=line).add_to(map_osm)
 
         # folium.Marker((s2_lat, s2_long + 0.001), icon=DivIcon(
         #     icon_size=(150, 36),

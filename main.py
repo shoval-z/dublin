@@ -2,26 +2,28 @@ import pandas as pd
 import ast
 import time
 
-bus_stop = pd.read_csv('data/bus_stop.csv')
+# bus_stops_in_each_journey = pd.read_csv('data/bus_stops_in_each_journey.csv')
+# bus_lines_route = pd.read_csv('bus_lines_route.csv')
+# a=1
 # attraction = pd.read_csv('attraction.csv')
 # attraction_busStop = pd.read_csv('attraction&station.csv')
 # bus_stops_journey = pd.read_csv('line&station.csv')
 
-line_and_optional_stations_df = pd.DataFrame(columns=['lineId','stations'])
-line_and_optional_stations_dict = dict()
-
-for idx,row in bus_stop.iterrows():
-    optional_lines = row['routes_served'].split(', ')
-    for line in optional_lines:
-        if line not in line_and_optional_stations_dict:
-            line_and_optional_stations_dict[line] = [row['stop_code']]
-        else:
-            line_and_optional_stations_dict[line].append(row['stop_code'])
-for key,value in line_and_optional_stations_dict.items():
-    line_and_optional_stations_df.at[-1] = [key,value]
-    line_and_optional_stations_df.index = line_and_optional_stations_df.index + 1
-
-line_and_optional_stations_df.to_csv('line_and_optional_stations.csv',index=False)
+# line_and_optional_stations_df = pd.DataFrame(columns=['lineId','stations'])
+# line_and_optional_stations_dict = dict()
+#
+# for idx,row in bus_stop.iterrows():
+#     optional_lines = row['routes_served'].split(', ')
+#     for line in optional_lines:
+#         if line not in line_and_optional_stations_dict:
+#             line_and_optional_stations_dict[line] = [row['stop_code']]
+#         else:
+#             line_and_optional_stations_dict[line].append(row['stop_code'])
+# for key,value in line_and_optional_stations_dict.items():
+#     line_and_optional_stations_df.at[-1] = [key,value]
+#     line_and_optional_stations_df.index = line_and_optional_stations_df.index + 1
+#
+# line_and_optional_stations_df.to_csv('line_and_optional_stations.csv',index=False)
 
 
 # station_to_attrction = pd.DataFrame(columns=['station', 'attraction', 'lines'])
