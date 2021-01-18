@@ -174,11 +174,11 @@ class MyFrame(wx.Frame):
                                         pos=(20, 220))
         elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the first attraction are: {first_lines}\n for more inforamtion you can contect {phone}",
+                                        f"The needed lines for the first attraction are: {lines}\n for more inforamtion you can contect {phone}",
                                         pos=(20, 220))
         else:
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the first attraction are: {first_lines}\n",
+                                        f"The needed lines for the first attraction are: {lines}\n",
                                         pos=(20, 220))
         sizer.Add(staticText1, 0, wx.ALL)
 
@@ -202,11 +202,11 @@ class MyFrame(wx.Frame):
                                         pos=(20, 280))
         elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the second attraction are: {second_lines}\n for more inforamtion you can contect {phone}",
+                                        f"The needed lines for the second attraction are: {lines}\n for more inforamtion you can contect {phone}",
                                         pos=(20, 280))
         else:
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the second attraction are: {second_lines}\n",
+                                        f"The needed lines for the second attraction are: {lines}\n",
                                         pos=(20, 280))
         sizer.Add(staticText1, 0, wx.ALL)
 
@@ -230,11 +230,11 @@ class MyFrame(wx.Frame):
                                         pos=(20, 340))
         elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the third attraction are: {third_lines}\n for more inforamtion you can contect {phone}",
+                                        f"The needed lines for the third attraction are: {lines}\n for more inforamtion you can contect {phone}",
                                         pos=(20, 340))
         else:
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the third attraction are: {third_lines}\n",
+                                        f"The needed lines for the third attraction are: {lines}\n",
                                         pos=(20, 340))
         sizer.Add(staticText1, 0, wx.ALL)
 
@@ -311,8 +311,11 @@ class MyFrame(wx.Frame):
                 line += item2
             points = find_bus_route(line,(s1_lat,s1_long),(at1_lat,at1_long))
             if points:
-                color = possible_colors[0]
-                del possible_colors[0]
+                if len(possible_colors) == 0:
+                    color = 'blue'
+                else:
+                    color = possible_colors[0]
+                    del possible_colors[0]
                 folium.vector_layers.PolyLine(points, color=color,tooltip=line).add_to(map_osm)
 
         second_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.second_a) & (
@@ -328,8 +331,11 @@ class MyFrame(wx.Frame):
                 line += item2
             points = find_bus_route(line, (s2_lat, s2_long), (at2_lat, at2_long))
             if points:
-                color = possible_colors[0]
-                del possible_colors[0]
+                if len(possible_colors) == 0:
+                    color = 'blue'
+                else:
+                    color = possible_colors[0]
+                    del possible_colors[0]
                 folium.vector_layers.PolyLine(points, color=color,tooltip=line).add_to(map_osm)
 
         third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.third_a) & (
@@ -345,8 +351,11 @@ class MyFrame(wx.Frame):
                 line += item2
             points = find_bus_route(line, (s3_lat, s3_long), (at3_lat, at3_long))
             if points:
-                color = possible_colors[0]
-                del possible_colors[0]
+                if len(possible_colors) == 0:
+                    color = 'blue'
+                else:
+                    color = possible_colors[0]
+                    del possible_colors[0]
                 folium.vector_layers.PolyLine(points, color=color,tooltip=line).add_to(map_osm)
 
         # folium.Marker((s2_lat, s2_long + 0.001), icon=DivIcon(
