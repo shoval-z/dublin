@@ -15,15 +15,22 @@ import math
 
 class MyFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, title="Plan Your Trip in Dublin!", size=(1100, 550))
-        # self.panel = wx.Panel(self, wx.ID_ANY, size=(1100, 550))
+        wx.Frame.__init__(self, None, title="Plan Your Trip in Dublin!", size=(1100, 650))
+        self.panel = wx.Panel(self,size=(350, 40), pos=(20, 10))
+        panel = wx.Panel(self, size=(500, 40), pos=(20, 10))
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        staticText1 = wx.StaticText(self, -1, "Plan your trip in Dublin!",size=(500, 40), pos=(20, 10))
+        staticText1.SetFont(wx.Font(26, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.FONTWEIGHT_BOLD, False, 'Ariel'))
+        staticText1.SetForegroundColour('#1e67bd')
+        sizer.Add(staticText1, 0, wx.ALL)
         # self.panel.SetBackgroundColour("Blue")
         sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        panel = wx.Panel(self, size=(350, 40), pos=(20, 10))
+        panel = wx.Panel(self, size=(370, 40), pos=(20, 60))
         # panel.SetBackgroundColour(wx.Colour(0, 128,128))
 
         staticText1 = wx.StaticText(panel, -1, " Choose your current bus station:")
+        staticText1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Ariel'))
         sizer.Add(staticText1, 0, wx.ALL)
 
         stations = pd.read_csv('data/bus_stop.csv')
@@ -39,14 +46,14 @@ class MyFrame(wx.Frame):
 
         sizer.Add(self.combo_box_product, 0, wx.ALL, 10)
         button = wx.Button(panel, -1, "Select")
-        button.SetBackgroundColour((255, 230, 200, 255))
+        button.SetBackgroundColour('#7F9DC0')
         self.Bind(wx.EVT_BUTTON, self.func, button)
         sizer.Add(button, 0, wx.ALL, 10)
 
         # set image
-        panel = wx.Panel(self, size=(550, 220), pos=(550, 10))
+        panel = wx.Panel(self, size=(512, 288), pos=(550, 10))
         sizer1 = wx.GridBagSizer(5, 5)
-        icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('data/welcome_dublin.png'))
+        icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('data/dublin_guide_resized.jpg'))
         sizer1.Add(icon, pos=(0, 4), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,
                    border=5)
 
@@ -70,7 +77,6 @@ class MyFrame(wx.Frame):
         return product
 
     def func(self, event):
-        # panel = wx.Panel(self, size=(750, 40), pos=(20, 70))
         x = self.OnCombo(None)
         print(x)
         self.first_s = int(x)
@@ -78,14 +84,15 @@ class MyFrame(wx.Frame):
         att = list(att)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        staticText1 = wx.StaticText(self, -1, " Choose your first attraction:", pos=(20, 60))
+        staticText1 = wx.StaticText(self, -1, " Choose your first attraction:", pos=(20, 110))
+        staticText1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Ariel'))
         sizer.Add(staticText1, 0, wx.ALL)
-        self.combo_box_product = wx.ComboBox(self, wx.ID_ANY, choices=att, pos=(20, 80),
+        self.combo_box_product = wx.ComboBox(self, wx.ID_ANY, choices=att, pos=(20, 130),size=(425, 40),
                                              style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_COMBOBOX, self.OnCombo2, self.combo_box_product)
         sizer.Add(self.combo_box_product, 0, wx.ALL, 10)
-        button = wx.Button(self, -1, "Select", pos=(470, 80))
-        button.SetBackgroundColour((255, 230, 200, 255))
+        button = wx.Button(self, -1, "Select", pos=(460, 130))
+        button.SetBackgroundColour('#7F9DC0')
         self.Bind(wx.EVT_BUTTON, self.func2, button)
         sizer.Add(button, 0, wx.ALL, 10)
 
@@ -101,18 +108,19 @@ class MyFrame(wx.Frame):
         print(int_stations)
         self.second_s = int_stations
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        staticText1 = wx.StaticText(self, -1, " Choose your second attraction:", pos=(20, 110))
+        staticText1 = wx.StaticText(self, -1, " Choose your second attraction:", pos=(20, 160))
+        staticText1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Ariel'))
         sizer.Add(staticText1, 0, wx.ALL)
 
         att = self.station_to_attraction[self.station_to_attraction['station'].isin(int_stations)]['attraction'].values
 
         att = list(att)
-        self.combo_box_product = wx.ComboBox(self, wx.ID_ANY, choices=att, pos=(20, 130),
+        self.combo_box_product = wx.ComboBox(self, wx.ID_ANY, choices=att, pos=(20, 180),size=(425, 40),
                                              style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_COMBOBOX, self.OnCombo3, self.combo_box_product)
         sizer.Add(self.combo_box_product, 0, wx.ALL, 10)
-        button = wx.Button(self, -1, "Select", pos=(470, 130))
-        button.SetBackgroundColour((255, 230, 200, 255))
+        button = wx.Button(self, -1, "Select", pos=(460, 180))
+        button.SetBackgroundColour('#7F9DC0')
         self.Bind(wx.EVT_BUTTON, self.func3, button)
         sizer.Add(button, 0, wx.ALL, 10)
 
@@ -132,15 +140,16 @@ class MyFrame(wx.Frame):
 
         att = list(att)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        staticText1 = wx.StaticText(self, -1, " Choose your third attraction:", pos=(20, 160))
+        staticText1 = wx.StaticText(self, -1, " Choose your third attraction:", pos=(20, 210))
+        staticText1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Ariel'))
         sizer.Add(staticText1, 0, wx.ALL)
 
-        self.combo_box_product = wx.ComboBox(self, wx.ID_ANY, choices=att, pos=(20, 180),
+        self.combo_box_product = wx.ComboBox(self, wx.ID_ANY, choices=att, pos=(20, 230),size=(425, 40),
                                              style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_COMBOBOX, self.OnCombo, self.combo_box_product)
         sizer.Add(self.combo_box_product, 0, wx.ALL, 10)
-        button = wx.Button(self, -1, "Select", pos=(470, 180))
-        button.SetBackgroundColour((255, 230, 200, 255))
+        button = wx.Button(self, -1, "Select", pos=(460, 230))
+        button.SetBackgroundColour('#7F9DC0')
         self.Bind(wx.EVT_BUTTON, self.func4, button)
         sizer.Add(button, 0, wx.ALL, 10)
 
@@ -161,6 +170,8 @@ class MyFrame(wx.Frame):
             for idx2, item2 in enumerate(item):
                 if (idx2 < 2 and item2 == '0') or idx2 == 4:
                     continue
+                if idx2 == 2 and item2 == '0' and item[idx2-1] == '0':
+                    continue
                 lines += item2
             if idx != len(first_lines) - 1:
                 lines += ', '
@@ -170,16 +181,17 @@ class MyFrame(wx.Frame):
         url = str(att[att['Name'] == self.first_a]['Url'].values[0])
         if phone != 'nan' and url != 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the first attraction are: {lines}\n for more inforamtion you can contect {phone}\n and visit {url}",
-                                        pos=(20, 220))
+                                        f"The needed lines for the first attraction are: {lines}\nFor more inforamtion you can contect {phone}\nand visit {url}",
+                                        pos=(20, 290))
         elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the first attraction are: {lines}\n for more inforamtion you can contect {phone}",
-                                        pos=(20, 220))
+                                        f"The needed lines for the first attraction are: {lines}\nFor more inforamtion you can contect {phone}",
+                                        pos=(20, 290))
         else:
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the first attraction are: {lines}\n",
-                                        pos=(20, 220))
+                                        pos=(20, 290))
+        staticText1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Calibri'))
         sizer.Add(staticText1, 0, wx.ALL)
 
         second_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.second_a) & (
@@ -190,6 +202,8 @@ class MyFrame(wx.Frame):
             for idx2, item2 in enumerate(item):
                 if (idx2 < 2 and item2 == '0') or idx2 == 4:
                     continue
+                if idx2 == 2 and item2 == '0' and item[idx2-1] == '0':
+                    continue
                 lines += item2
             if idx != len(second_lines) - 1:
                 lines += ', '
@@ -198,16 +212,17 @@ class MyFrame(wx.Frame):
         url = str(att[att['Name'] == self.second_a]['Url'].values[0])
         if phone != 'nan' and url != 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the second attraction are: {lines}\n for more inforamtion you can contect {phone}\n and visit {url}",
-                                        pos=(20, 280))
+                                        f"The needed lines for the second attraction are: {lines}\nFor more inforamtion you can contect {phone}\nand visit {url}",
+                                        pos=(20, 370))
         elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the second attraction are: {lines}\n for more inforamtion you can contect {phone}",
-                                        pos=(20, 280))
+                                        f"The needed lines for the second attraction are: {lines}\nFor more inforamtion you can contect {phone}",
+                                        pos=(20, 370))
         else:
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the second attraction are: {lines}\n",
-                                        pos=(20, 280))
+                                        pos=(20, 370))
+        staticText1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Calibri'))
         sizer.Add(staticText1, 0, wx.ALL)
 
         third_lines = self.station_to_attraction[(self.station_to_attraction['attraction'] == self.third_a) & (
@@ -218,6 +233,8 @@ class MyFrame(wx.Frame):
             for idx2, item2 in enumerate(item):
                 if (idx2 < 2 and item2 == '0') or idx2 == 4:
                     continue
+                if idx2 == 2 and item2 == '0' and item[idx2-1] == '0':
+                    continue
                 lines += item2
             if idx != len(third_lines) - 1:
                 lines += ', '
@@ -226,28 +243,30 @@ class MyFrame(wx.Frame):
         url = str(att[att['Name'] == self.third_a]['Url'].values[0])
         if phone != 'nan' and url != 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the third attraction are: {lines}\n for more inforamtion you can contect {phone}\n and visit {url}",
-                                        pos=(20, 340))
+                                        f"The needed lines for the third attraction are: {lines}\nFor more inforamtion you can contect {phone}\nand visit {url}",
+                                        pos=(20, 450))
         elif phone != 'nan' and url == 'nan':
             staticText1 = wx.StaticText(self, -1,
-                                        f"The needed lines for the third attraction are: {lines}\n for more inforamtion you can contect {phone}",
-                                        pos=(20, 340))
+                                        f"The needed lines for the third attraction are: {lines}\nFor more inforamtion you can contect {phone}",
+                                        pos=(20, 450))
         else:
             staticText1 = wx.StaticText(self, -1,
                                         f"The needed lines for the third attraction are: {lines}\n",
-                                        pos=(20, 340))
+                                        pos=(20, 450))
+        staticText1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL, False, 'Calibri'))
         sizer.Add(staticText1, 0, wx.ALL)
 
         # set image
-        panel = wx.Panel(self, size=(500, 300), pos=(600, 250))
+        panel = wx.Panel(self, size=(480, 250), pos=(600, 320))
         sizer1 = wx.GridBagSizer(5, 5)
         icon = wx.StaticBitmap(panel, bitmap=wx.Bitmap('data/dublin_safe.png'))
         sizer1.Add(icon, pos=(0, 4), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,
                    border=5)
 
         # set hyperlink to map
-        hl.HyperLinkCtrl(self, -1, 'To see on map click here', URL="https://epic-lumiere-c21f13.netlify.app/",
-                         pos=(20, 400), size=(140, 20))
+        hl.HyperLinkCtrl(self, -1, 'To see the locations on map click here', URL="https://epic-lumiere-c21f13.netlify.app/",
+                         pos=(20, 540), size=(200, 20)).SetBold(Bold=True)
+
 
     def create_map(self):
         att = pd.read_csv('data/attraction.csv')
@@ -278,7 +297,6 @@ class MyFrame(wx.Frame):
         folium.Marker(location=[s1_lat, s1_long],
                       icon=folium.Icon(icon='bus', prefix='fa',color='red')).add_to(
             map_osm)
-
 
         folium.Marker(location=[s2_lat, s2_long],
                       icon=folium.Icon(icon='bus', prefix='fa',color='purple'),tooltip=f'station to {self.second_a}').add_to(
@@ -375,20 +393,20 @@ class MyFrame(wx.Frame):
             icon_anchor=(7, 20),
             html='<div style="font-size: 11pt; color : red; font-weight:bold; background:white; opacity:0.75;border:2px solid black;">you are here</div>',
         )).add_to(map_osm)
-        folium.Marker((at1_lat, at1_long + 0.001), icon=DivIcon(
+        folium.Marker((at1_lat, at1_long + 0.005), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
-            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">1 {self.first_a}</div>',
+            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;"> 1 {self.first_a}</div>',
         )).add_to(map_osm)
-        folium.Marker((at2_lat, at2_long + 0.001), icon=DivIcon(
+        folium.Marker((at2_lat, at2_long + 0.005), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
-            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">2 {self.second_a}</div>',
+            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;"> 2 {self.second_a}</div>',
         )).add_to(map_osm)
         folium.Marker((at3_lat, at3_long + 0.001), icon=DivIcon(
             icon_size=(150, 36),
             icon_anchor=(7, 20),
-            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;">3 {self.third_a}</div>',
+            html=f'<div style="font-size: 11pt; color : black;font-weight:bold;background:white;opacity:0.75;border:2px solid black;"> 3 {self.third_a}</div>',
         )).add_to(map_osm)
 
 
